@@ -75,3 +75,42 @@ print("disjoint",collection_two.isdisjoint(collection_one))
 print("superset",collection_one.issuperset(collection_two))
 
 
+"""
+# Now lets work on mutables
+
+1. List
+2. Set
+3. Dictionary
+4. ByteArray
+"""
+
+# List
+items = [1,2,4,5,6,7,8]
+items.append(10) # append one item to end of list
+items.insert(0,100) # append one item anywhere in list based on index
+items += [9,10] # append many items at end of list
+items.extend([12,13]) # alternative to above syntax
+items[-2:-2] = [1,4] # append many items anywhere in list based on index
+items[0] = 0 # replace any one item based on index
+items[-3:-2] = [4,500] # replace many items based on index
+print("pop last item in list",items.pop())
+print("pop specific item with index",items.pop(0))
+items.remove(4) # remove item in list. note: only first occurence
+print("counter",items.count(1))
+print("finder",items.index(6))
+print("sorted numbers",items.sort()) # sort numbers
+print("reversed_numbers",items.reverse()) # reverse numbers
+print("quering/slicing",items[3:-2],items[::2]) # [start_index:end_index:step]
+
+# Dictionary
+records = {"name":"google","year":1998,"origin":"USA"}
+print("keys and values",records.items())
+print("only keys",records.keys())
+print("only values",records.values())
+records["CEO"] = "sundar" # add single key-value pair
+records.update({"products":["GCP","Google One"],"pricing":50000,"name":"Google Parent"}) # add/updates multiple key-value pairs
+default_keys = dict.fromkeys(["metadata","version","life"],None) # take some bunch of keys at once and assign them same value which is None, in this case
+records.update(default_keys) # update dictionary info
+print("get an item",records.get("age","Not Found")) # if key is not present "Not Found" will be returned
+records.pop("life")
+print("popped item",records.popitem())
