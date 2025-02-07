@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // there are types of schemas. this specific type is a plain deployment.
+                                                                                                 //deployments can be either tenant-level or managementgroup-level or subscription-level
+    "contentVersion":"1.0.0.0",
+    "resources":[ // whatever resources we want to deploy, we will mention them here
+        {
+            "name": "trailstorageaccount1a57", // this is a storage account, so we are mentioning storage account name
+            "type": "Microsoft.Storage/storageAccounts", // type of resource that we are deploying
+            "apiVersion": "2023-05-01", // resource type version
+            "tags": { // tags
+                "displayName": "trailstorageaccount1a57"
+            },
+            "location": "[resourceGroup().location]", // resourceGroup() value will be filled in runtime. we want to use the same region as resource group
+            "kind": "StorageV2", // kind of storage account
+            "sku": { // SKU
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deploymentScripts", // this is your custom deployment script
+            "apiVersion": "2020-10-01",
+            "name": "runPowerShellInline",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "tagName1": "tagValue1",
+                "tagName2": "tagValue2"
+            },
+            "kind": "AzurePowerShell", // or "AzureCLI"
+            "identity": { // identity for this script to run with previlege. this identity is required and is mapped to a user-assigned role
+                "type": "userAssigned",
+                "userAssignedIdentities": {
+                "/subscriptions/aaaabbbb-0000-cccc-1111-dddd2222eeee/resourceGroups/myResourceGroup/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myID": {}
+                }
+            },
+            "properties": {
+                "forceUpdateTag": "1", // container instance is required for deployment script to run.
+                "containerSettings": {
+                "containerGroupName": "mycustomaci"
+                },
+                "storageAccountSettings": { // storage account is also required for deployment script to run.
+                "storageAccountName": "myStorageAccount",
+                "storageAccountKey": "myKey"
+                },
+                "azPowerShellVersion": "9.7",  // or "azCliVersion": "2.47.0",
+                "arguments": "-name \\\"John Dole\\\"", // these are arguments to the script
+                "environmentVariables": [ // we can also pass environment variables to the script
+                {
+                    "name": "UserName",
+                    "value": "jdole"
+                },
+                {
+                    "name": "Password",
+                    "secureValue": "jDolePassword"
+                }
+                ],
+                "scriptContent": "
+                param([string] $name)
+                $output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
+                Write-Output $output
+                $DeploymentScriptOutputs = @{}
+                $DeploymentScriptOutputs['text'] = $output
+                ", // or "primaryScriptUri": "https://raw.githubusercontent.com/Azure/azure-docs-json-samples/master/deployment-script/deploymentscript-helloworld.ps1",
+                // we can either pass the script content or the script URI that needs to be executed in the container instance
+                "supportingScriptUris":[],
+                "timeout": "PT30M", // maximum allowed script execution time. PT30M means 30 minutes
+                "cleanupPreference": "OnSuccess", // deletes above mentioned container instance and storage account (myStorageAccount) once this script execution is success.
+                "retentionInterval": "P1D" // this desployment script resource will not be deleted unitl 1 day (P1D) is done after script execution.
+            }
+        }
+    ]
+}
