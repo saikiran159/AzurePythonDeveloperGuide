@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scope is resource group
+    "contentVersion": "1.0.0.0", // version
+    "parameters": {
+      "identity": {
+        "type": "string"
+      },
+      "utcValue": {
+        "type": "string",
+        "defaultValue": "[utcNow()]"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts",
+        "apiVersion": "2020-10-01",
+        "name": "runBashWithOutputs",
+        "location": "[resourceGroup().location]",
+        "kind": "AzureCLI", // this time it is azure cli
+        "identity": {
+          "type": "UserAssigned",
+          "userAssignedIdentities": {
+            "[parameters('identity')]": {
+            }
+          }
+        },
+        "properties": {
+          "forceUpdateTag": "[parameters('utcValue')]",
+          "AzCliVersion": "2.40.0",
+          "timeout": "PT30M",
+          "arguments": "'foo' 'bar'",
+          "environmentVariables": [
+            {
+              "name": "UserName",
+              "value": "jdole"
+            },
+            {
+              "name": "Password",
+              "secureValue": "jDolePassword"
+            }
+          ],
+          // this part is little tricky with azure cli. In azure cli, output will be a plain text not an object.
+          // so azure came up with an idea here. azure says, use azure cli and other tools like jq (https://jqlang.org/) to create a json (json string) like structure which is kind of a dictionary
+          // and write it to a json file located in /mnt/azscripts/azscriptoutput/scriptoutputs.json. well azure helps again here storing this json path to an environment variable called AZ_SCRIPTS_OUTPUT_PATH
+          "scriptContent": "result=$(az keyvault list); echo \"arg1 is: $1\"; echo \"arg2 is: $2\"; echo \"Username is: $UserName\"; echo \"password is: $Password\"; echo $result | jq -c '{Result: map({id: .id})}' > $AZ_SCRIPTS_OUTPUT_PATH",
+          "cleanupPreference": "OnExpiration",
+          "retentionInterval": "P1D" // how long does deployment script resource exist in portal: as per the value P1D: it is 1 day
+        }
+    }
+    ]
+}
+
+// once you kickstart this deployment script, we can also see the logs, input and output of the scripts in azure portal too

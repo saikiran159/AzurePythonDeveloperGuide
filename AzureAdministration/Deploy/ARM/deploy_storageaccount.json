@@ -33,8 +33,8 @@
                 "/subscriptions/aaaabbbb-0000-cccc-1111-dddd2222eeee/resourceGroups/myResourceGroup/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myID": {}
                 }
             },
-            "properties": {
-                "forceUpdateTag": "1", // container instance is required for deployment script to run.
+            "properties": { // container instance is required for deployment script to run.
+                "forceUpdateTag": "1", // even deployment scripts are idempotent. so, if you still want to re-run this deployment script, then change this value manually or use ant pre-built funciton like utcNow
                 "containerSettings": {
                 "containerGroupName": "mycustomaci"
                 },
@@ -62,7 +62,7 @@
                 $DeploymentScriptOutputs['text'] = $output
                 ", // or "primaryScriptUri": "https://raw.githubusercontent.com/Azure/azure-docs-json-samples/master/deployment-script/deploymentscript-helloworld.ps1",
                 // we can either pass the script content or the script URI that needs to be executed in the container instance
-                "supportingScriptUris":[],
+                "supportingScriptUris":[], // we can provide additional scripts (probably .ps1 (if Kind is Azure powershell) or .sh(if Kind is Azure cli)) note: these additional scripts can be accessed in primary script above in folder /mnt/azscripts/azscriptinput (azure cli) or azscripts/azscriptinput (azure powershell)
                 "timeout": "PT30M", // maximum allowed script execution time. PT30M means 30 minutes
                 "cleanupPreference": "OnSuccess", // deletes above mentioned container instance and storage account (myStorageAccount) once this script execution is success.
                 "retentionInterval": "P1D" // this desployment script resource will not be deleted unitl 1 day (P1D) is done after script execution.

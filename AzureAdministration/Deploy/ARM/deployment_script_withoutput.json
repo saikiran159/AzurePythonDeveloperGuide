@@ -1,0 +1,44 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scoped to resource group
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "name": {
+        "type": "string",
+        "defaultValue": "\\\"John Dole\\\""
+      },
+      "utcValue": {
+        "type": "string",
+        "defaultValue": "[utcNow()]"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts", // start a script
+        "apiVersion": "2020-10-01",
+        "name": "runPowerShellInlineWithOutput",
+        "location": "[resourceGroup().location]",
+        "kind": "AzurePowerShell", // shell type
+        "properties": {
+          "forceUpdateTag": "[parameters('utcValue')]",
+          "azPowerShellVersion": "8.3",
+          "scriptContent": "
+            param([string] $name)
+            $output = \"Hello {0}\" -f $name
+            Write-Output $output
+            $DeploymentScriptOutputs = @{}
+            $DeploymentScriptOutputs['text'] = $output
+          ", // we can pass output of this script execution to ARM template using [DeploymentScriptOutputs] variable in script. this is accessed outside with syntax: deploymentscriptname.outputs.[key in DeploymentScriptOutputs]
+          "arguments": "[concat('-name', ' ', parameters('name'))]",
+          "timeout": "PT1H", // will wait for 1H to execute this script
+          "cleanupPreference": "OnSuccess",// removes created storage account and container instances created behind the scenes to run this script once execution is successful
+          "retentionInterval": "P1D" // deployment details exist in portal for 1 day
+        }
+      }
+    ],
+    "outputs": {
+      "result": {
+        "value": "[reference('runPowerShellInlineWithOutput').outputs.text]", // we can access deployment script output here using reference, deploymentscriptname
+        "type": "string"
+      }
+    }
+  }
