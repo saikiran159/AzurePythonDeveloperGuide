@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scoped to resource group
+    "contentVersion": "1.0.0.0", // content version : Major.Minor.Patch.Revision
+    "parameters": { // parameters that can be passed on template invocation
+      "numberOfDataDisks": {
+        "type": "int",
+        "minValue": 0, // checks on the parameter value
+        "maxValue": 16, // checks on the parameter value
+        "defaultValue": 3,
+        "metadata": {
+          "description": "The number of dataDisks to create."
+        }
+      }
+    },
+    "resources": [
+      {
+        "name": "trailvirtualmachine",
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2022-11-01",
+        "properties": {
+          "storageProfile": {
+            "copy": [ // copy properties
+              {
+                "name": "dataDisks", // property name for which values have to be duplicated
+                "count": "[parameters('numberOfDataDisks')]", // times of copy
+                "input": { // above property value to be duplicated
+                  "lun": "[copyIndex('dataDisks')]",
+                  "createOption": "Empty",
+                  "diskSizeGB": 1023
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }

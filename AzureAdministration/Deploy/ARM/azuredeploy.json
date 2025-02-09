@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scope is resource group
+    "contentVersion": "1.0.0.0", // version : Major:Minor:Patch:Revision
+    "parameters": {
+      "projectName": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 11,
+        "metadata": {
+          "description": "Specify a project name that is used to generate resource names."
+        }
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Specify a location for the resources."
+        }
+      },
+      "linuxFxVersion": {
+        "type": "string",
+        "defaultValue": "php|7.0",
+        "metadata": {
+          "description": "The Runtime stack of current web app"
+        }
+      }
+    },
+    "variables": {
+      "storageAccountName": "[concat(parameters('projectName'), uniqueString(resourceGroup().id))]",
+      "webAppName": "[concat(parameters('projectName'), 'WebApp')]",
+      "appServicePlanName": "[concat(parameters('projectName'), 'Plan')]"
+    },
+    "resources": [
+      {
+        "name": "linkedTemplate",
+        "type": "Microsoft.Resources/deployments", // now we are referring to another ARM template here
+        "apiVersion": "2022-09-01",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "relativePath": "linkedStorageAccount.json" // this is the path to the linked ARM template
+          },
+          "parameters": { // parameters for that linked ARM template
+            "storageAccountName": {
+              "value": "[variables('storageAccountName')]"
+            },
+            "location": {
+              "value": "[parameters('location')]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2022-09-01",
+        "name": "[variables('appServicePlanName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "B1",
+          "tier": "Basic",
+          "size": "B1",
+          "family": "B",
+          "capacity": 1
+        },
+        "kind": "linux",
+        "properties": {
+          "perSiteScaling": false,
+          "reserved": true,
+          "targetWorkerCount": 0,
+          "targetWorkerSizeId": 0
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2022-09-01",
+        "name": "[variables('webAppName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+        ],
+        "kind": "app",
+        "properties": {
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+          "siteConfig": {
+            "linuxFxVersion": "[parameters('linuxFxVersion')]"
+          }
+        }
+      }
+    ],
+    "outputs": {
+      "storageEndpoint": {
+        "type": "object",
+        "value": "[reference('linkedTemplate').outputs.storageEndpoint.value]" // reference template outputs storageEndpoint variable
+      }
+    }
+  }

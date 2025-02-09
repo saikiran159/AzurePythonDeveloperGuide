@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", //scoped to resource group
+    "languageVersion": "2.0", // this property have to be used to convert a template to symbolic
+    "contentVersion": "1.0.0.0", // content version : Major.Minor.Patch.Revision
+    "parameters": { // parameters that will be passed on kickstart of this template deployment
+      "storageAccountName": {
+        "type": "string",
+        "defaultValue": "[format('storage{0}', uniqueString(resourceGroup().id))]" // optional parameter
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]" //optional parameter
+      }
+    },
+    "resources": { // this syntax of not using a list, is also required to create symbolic templates
+      "myStorage": {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2022-09-01",
+        "name": "[parameters('storageAccountName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {}
+      }
+    },
+    "outputs": {
+      "myStorage":{
+        "type": "object",
+        "value": "[reference('myStorage')]" // this is the benifit of using symbolic templates, we can refer resource
+      }
+    }
+  }

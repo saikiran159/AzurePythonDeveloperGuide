@@ -1,0 +1,106 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", //scoped to resource group
+    "contentVersion": "1.0.0.0", // content version: Major.Minor.Patch.Revision
+    "parameters": { // parameters that will be passed during invocation of this deployment script
+      "location": { // remember this parameter. this is again used in nested template
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "The location where the resources will be deployed."
+        }
+      },
+      "vaultName": {
+        "type": "string",
+        "metadata": {
+          "description": "The name of the keyvault that contains the secret." // required parameter
+        }
+      },
+      "secretName": {
+        "type": "string", // required parameter
+        "metadata": {
+          "description": "The name of the secret."
+        }
+      },
+      "vaultResourceGroupName": {
+        "type": "string", // required parameter
+        "metadata": {
+          "description": "The name of the resource group that contains the keyvault."
+        }
+      },
+      "vaultSubscription": {
+        "type": "string",
+        "defaultValue": "[subscription().subscriptionId]", //optional parameter
+        "metadata": {
+          "description": "The name of the subscription that contains the keyvault."
+        }
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2022-09-01",
+        "name": "dynamicSecret",
+        "properties": {
+          "mode": "Incremental",
+          "expressionEvaluationOptions": {
+            "scope": "inner" // expression evaluations, meaning parameters or variables or functions like resourcegroup, etc will be scoped within this nested template. if outer is defined here, that means these will be inherited from parent
+          },
+          "parameters": {
+            "location": { // location again used here. when this parameter is used below, we will have a confusion. from where this value should be refered, parent or nested?.
+                         // if expressionEvaluationOptions set to  `inner` this will take nested template's location parameter otherwise it will use parent template's location parameter
+              "value": "[parameters('location')]"
+            },
+            "adminLogin": {
+              "value": "ghuser"
+            },
+            "adminPassword": {
+              "reference": {
+                "keyVault": {
+                  "id": "[resourceId(parameters('vaultSubscription'), parameters('vaultResourceGroupName'), 'Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+                },
+                "secretName": "[parameters('secretName')]"
+              }
+            }
+          },
+          "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {
+              "adminLogin": {
+                "type": "string"
+              },
+              "adminPassword": {
+                "type": "securestring"
+              },
+              "location": {
+                "type": "string"
+              }
+            },
+            "variables": {
+              "sqlServerName": "[format('sql-{0}sql', uniqueString(resourceGroup().id, 'sql'))]"
+            },
+            "resources": [
+              {
+                "type": "Microsoft.Sql/servers",
+                "apiVersion": "2022-05-01-preview",
+                "name": "[variables('sqlServerName')]",
+                "location": "[parameters('location')]",
+                "properties": {
+                  "administratorLogin": "[parameters('adminLogin')]",
+                  "administratorLoginPassword": "[parameters('adminPassword')]"
+                }
+              }
+            ],
+            "outputs": {
+              "sqlFQDN": {
+                "type": "string",
+                "value": "[reference(variables('sqlServerName')).fullyQualifiedDomainName]"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outputs": {
+    }
+  }

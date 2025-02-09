@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scope is resource group
+    "contentVersion": "1.0.0.0", // template version : Major.Minor.Patch.Revision
+    "parameters": { // parameters that can be passed on kickstart of the template
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+      },
+      "storageCount": {
+        "type": "int",
+        "defaultValue": 3
+      }
+    },
+    "resources": [
+      {
+        "copy": {
+          "name": "storagecopy",
+          "count": "[length(range(0, parameters('storageCount')))]" // how many times we want to copy
+        },
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2022-09-01",
+        "name": "[format('{0}storage{1}', range(0, parameters('storageCount'))[copyIndex()], uniqueString(resourceGroup().id))]", // format takes 3 inputs here, first is string and it has to resolve {0} and {1}, so we need to mention two more values. copyIndex() starts with 0, resourceGroup().id is a static value for all items in a loop
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {}
+      }
+    ]
+  }

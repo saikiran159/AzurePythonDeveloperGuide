@@ -1,0 +1,52 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", // scoped to resource group
+    "languageVersion": "2.0", // this is required to support symbolic names
+    "contentVersion": "1.0.0.0", // content version
+    "parameters": {
+      "storageAccountName": {
+        "type": "string",
+        "defaultValue": "[format('{0}{1}', 'storage', uniqueString(resourceGroup().id))]"
+  
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+      }
+    },
+    "resources": { // instead of list, we need to use dict ({}) to support symbolic names
+      "mainStorage": {
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2022-09-01",
+        "name": "[parameters('storageAccountName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "StorageV2"
+      },
+      "nestedResource": { // but nested resources doesn't support symbolic names. meaning we cant use `reference("nestedResource")` anywhere to get details of this nested resource
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2022-09-01",
+        "name": "nestedTemplate1",
+        "properties": {
+          "mode": "Incremental",
+          "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources": [
+              {
+                "type": "Microsoft.Storage/storageAccounts",
+                "apiVersion": "2022-09-01",
+                "name": "[format('{0}nested', parameters('storageAccountName'))]",
+                "location": "[parameters('location')]",
+                "sku": {
+                  "name": "Standard_LRS"
+                },
+                "kind": "StorageV2"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }

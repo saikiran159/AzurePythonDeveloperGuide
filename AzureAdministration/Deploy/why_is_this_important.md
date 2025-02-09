@@ -40,6 +40,10 @@ Azure provides a beautiful UI for creating and managing resources, so why should
 6. **Better Developer Experience** 👨‍💻
    - ARM templates (or better alternatives) contain a lot of syntax that is hard to remember.
    - Thankfully, **Azure provides VS Code extensions** to simplify the process! 🎉
+7. **Can Store deployment files for later use**
+   - ARM templates support template specs, which can be used to store the templates in azure **resource group**.
+   - From here, we can deploy the template with the resource group name where template spec is created and it's id.
+   - Template specs can be done through **Azure portal** too
 
 ---
 ### 📌 Conclusion
