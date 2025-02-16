@@ -1,0 +1,16 @@
+1.This `terraform.tfstate` file is created only when `terraform apply` command is executed successfully.
+
+2.This file contains all sensitive information about resources deployed using this terraform.
+
+3.If this file is lost while resources exist in azure, we have to use `terraform import` to generate this file again.
+this process involves manual changes too.
+
+4.For every other changes to this deployment, a file called `terraform.tfstate.backup` is created,
+this contains previous working state of the deployment.
+
+5.Since this is required and should not exist in git repo. we can use azure storage account as a place to store this state.
+this feature is called remote state.
+
+6.when we used azure storage account to store our state, we have a huge advantage, azure storage has a feature called lease. 
+when this lease is active on a file, no other person even the contributor will not have write access to this file.
+this makes sure that once one person can make change at any particular time and this change can be done by users with specific roles
