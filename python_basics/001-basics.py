@@ -1,6 +1,7 @@
 from typing import Any, List
 import time
 from copy import deepcopy
+from random import randint
 
 # Function
 def add(a:int,b:int) -> int:
@@ -72,3 +73,34 @@ print("veggies",veggies)
 # recap for scopes: if it is just reference, variable will be automatically retrieved based on scope.
 # But for assignment, scope must be explicitly defined, use global to use global variable. otherwise
 # define the variable
+
+# loops
+for i in range(5):
+    if i % 2 == 0:
+        pass # pass will continue executing below steps.
+    elif i % 3 == 0:
+        continue # below statements are not executed and loop is continued..
+    elif i % 10 == 0:
+        break # this will stop the loop
+    else:
+        print("items",i)
+    print("may be multiples of 2",i)
+
+while(True):
+    if randint(0,10) > 5:
+        break # breaks the loop
+
+table = {"name":"lalo","age":36}
+for itemidx,item in enumerate(table):
+    print("hash_item",itemidx,item)
+
+
+# Args(*) and Kwargs(**)
+list_items = [1,2,3,4,5,6,7,8]
+print("list",[11,12,*list_items])
+
+def titler(name,age):
+    print(f"{name} age is {age}")
+
+func_params = {"name":"alan","age":34}
+titler(**func_params)
