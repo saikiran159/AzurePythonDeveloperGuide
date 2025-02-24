@@ -76,15 +76,21 @@ For containerized applications, **Azure Container Registry** (ACR) is preferred 
 
 Azure Pipelines implement **CI/CD** to automate software builds, tests, and deployments.
 
-### 🎯 Pipeline Triggers
-Pipelines can be triggered by:
+- **Azure Pipelines** consists of two features: **Pipelines** and **Releases**.  
+- The **Pipeline** is the first to be triggered.  
+- **Pipelines (Continuous Integration - CI)** are used to build and run unit tests for the project.  
+- Only after the **Pipeline** successfully completes, the **Release (Continuous Deployment - CD)** process is triggered.
+- The **Release** can be triggered **automatically or manually**, depending on the configuration.
+
+### 🎯 Release Triggers
+Releases can be triggered by:
 1. **Branch Commits**
 2. **Pull Requests**
 3. **Scheduled Jobs**
 4. **External Endpoints**
 5. **Manual Triggers**
 
-### 🏗️ Pipeline Structure
+### 🏗️ Releases pipeline Structure
 1. Pipelines can be **designed via UI** or **YAML files**.
 2. Pipelines consist of **stages** (e.g., `Dev`, `Test`, `Production`).
 3. Each stage contains **jobs**, which execute **tasks** sequentially.
