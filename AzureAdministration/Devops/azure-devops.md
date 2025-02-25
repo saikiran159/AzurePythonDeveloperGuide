@@ -101,3 +101,58 @@ Releases can be triggered by:
 8. **Variable groups** store environment-specific configurations, alongside pre-built Azure DevOps variables.
 
 ---
+## Azure Test Plans 🚀
+
+### Why Testing is Important?
+Before deploying our application to production, we need to test it thoroughly. Some testing can be automated, while others need to be done manually.
+
+### ✅ Automated Testing
+We can automate the following types of tests:
+1. **Component-Level Testing**
+2. **Functional Testing**
+3. **Integration Testing**
+
+### 📝 Manual Testing
+Certain tests require manual execution:
+1. **User Acceptance Testing (UAT)**
+2. **Usability Testing**
+
+### 🛠️ Testing with Tools
+Some tests require specialized tools:
+1. **Performance Testing**
+2. **Security Testing**
+
+### 🔗 Storing Test Code in GitHub
+- Test scripts are usually stored in **GitHub** to be used by test automation tools.
+- Whenever a **commit** is made or a **pull request (PR)** is created, automated test scripts are executed.
+- If any test case **fails**, the pipeline can be configured to **stop** or follow a different behavior.
+
+### ⚙️ Running Tests in Azure DevOps
+- Tests run in **agents** that are configured for the task.
+- Unit testing tools may allow some test cases to be ignored.
+- **Azure Test Plans** provides a feature called **Code Coverage**, which shows:
+  - Test files that were **executed** ✅
+  - Test files that were **skipped** ❌
+- Code coverage is implemented using third-party libraries available in different programming languages, and Azure Test Plans presents the results in a **user-friendly UI**.
+
+### 🔄 Distributing Tests Across Agents
+When companies define a large number of test cases, running them all sequentially can be time-consuming. To optimize execution, test cases can be run in parallel. There are multiple **strategies** for distributing test cases:
+1. **Split test cases equally across agents**
+2. **Split test cases based on their execution time**
+3. **Split test cases based on their type**
+
+### 🐞 Handling Test Failures
+- If a test case **fails**, we can determine whether:
+  - It is a **new error** 🆕
+  - It is an **existing issue** ⚠️
+- We can directly **create a bug workitem** from Azure Test Plans and assign it for resolution.
+- If it is a new error, we can identify:
+  - The **commit** that introduced the error.
+  - The **exact line** of code that caused the failure.
+
+### 📄 Test Result Formats
+Azure Test Plans allows choosing different output formats for test results, including:
+- **JUnit**
+- **NUnit**
+- **XUnit**
+- **CTest** e.t.c
