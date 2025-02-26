@@ -68,6 +68,10 @@ Azure Artifacts is useful in two scenarios:
 1. **Private Package Management**: Securely manage software package lifecycles instead of using public package managers (e.g., `pip`, `npm`, `NuGet`).
 2. **Compiled Language Support**: Store and manage build outputs (e.g., `.dll` files for C#, minified and bundled JS files) for deployment.
 
+### 🔑 Key Takeaway
+- Use **Azure Artifacts** for **managing and distributing private dependencies**.
+- Use **Publish Artifact Task** to **store and transfer build outputs** between pipeline stages.
+
 For containerized applications, **Azure Container Registry** (ACR) is preferred over Azure Artifacts.
 
 ---
