@@ -35,5 +35,75 @@ print("class attribute: ",rect2.base_type) # change is reflected in object
 print(rect2.type)
 rect2.length(3,3)
 rect2.area(3,3)
-print("color: ",rect2.__material)
+print("color: ",rect2._color)
 
+# Let's look at pillars of OOPS
+# Inheritance: get capabilities of another class
+class Parent:
+    def __init__(self,name):
+        self.parent_name = name
+    def get_name(self):
+        return self.parent_name
+
+class Child(Parent):
+    def __init__(self, parent_name,your_name):
+        super().__init__(parent_name) # set parent class
+        self.name = your_name # set child object
+    def get_your_details(self):
+        print(f"my parent name is: {super().get_name()}.\nmy name is: {self.name}")
+
+child_obj = Child("howard stark","tony stark")
+child_obj.get_your_details()
+
+# Abstraction: like a blueprint on how a class should be
+from abc import ABC,abstractmethod
+
+class FileHandler(ABC):
+    @abstractmethod
+    def read_file(self,file_path):
+        pass
+    
+    @abstractmethod
+    def update_file(self,file_path,content):
+        pass
+
+    @abstractmethod
+    def create_file(self,file_path,content):
+        pass
+
+class TextFile(FileHandler):
+    def read_file(self, file_path):
+        with open(file_path,"r") as readResult:
+            content = readResult.readlines()
+        print("file content: ",content)
+    
+    def update_file(self, file_path, content):
+        with open(file_path,"a") as writer:
+            writer.write(content + "\n")
+
+    def create_file(self, file_path, content):
+        with open(file_path,"w") as writer:
+            writer.write(content + "\n")
+
+import json
+
+class JsonFile(FileHandler):
+    def read_file(self, file_path):
+        with open(file_path,"r") as readResult:
+            content = json.load(readResult)
+        print("file content: ",content)
+    
+    def update_file(self, file_path,key,content):
+        with open(file_path,"r") as readResult:
+            json_content = json.load(readResult)
+        
+        json_content[key] = content
+        
+        with open(file_path,"w") as writer:
+            json.dump(json_content,writer,indent=4)
+
+    def create_file(self, file_path, content):
+        with open(file_path,"w") as writer:
+            json.dump(content,writer,indent=4)
+
+# polymorphism: this is a slight extension to abstraction. this wants us to make sure parent class is replaced with child classes
