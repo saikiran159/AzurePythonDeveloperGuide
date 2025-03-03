@@ -24,6 +24,12 @@ Augmentation involves generating new variations of existing data samples without
 2. Random insertion, substitution, and deletion of words/characters
 3. Generating new sentences with the same meaning
 
+### ML-Model Augmentation Techniques 📝
+1. Over Sampling - increase dataset for minority class
+2. Under Sampling - decrease dataset for majority class
+3. SMOTE
+4. Class Weights
+
 With augmentation, we can generate a sufficient dataset for training, testing, and validating models.
 
 > **Note:** Some production scenarios may be difficult to replicate via augmentation, so it should be used as a last resort.
@@ -79,6 +85,48 @@ After tokenization, text must be converted into numerical form since computers u
 3. **Semantic Similarity** – More advanced, meaning-based similarity.
 4. **MMR (Maximal Marginal Relevance)** – Balances relevance and diversity in similarity comparisons.
 
+---
+
+## 🚀 Feature Engineering for Machine Learning Datasets  
+
+### 📌 Introduction  
+When working with a machine learning dataset (typically a CSV file), we encounter **numerical** and/or **categorical** data.  
+These raw data types need transformation or processing to ensure they are standardized for model training.  
+
+- **Numerical data** consists of numbers, ranging from single digits to large values, including decimals (e.g., \(10^{-8}\) to \(10^{-2}\)).  
+- **Categorical data** can be **ordinal** (having an inherent order) or **nominal** (no specific order).  
+- There can also be **missing values** in the dataset, requiring proper handling. 
+
+### 🔍 Handling Missing Values  
+- **Numerical Data**: Can be imputed using **mean, median, or mode**.  
+- **Categorical Data**: Can be filled using **frequency-based techniques**.  
+- Always consult business stakeholders for the best approach, as they understand the data better.
+
+### 🔢 Transforming Numerical Data  
+1. **Large numbers with positive exponentials** ➝ Apply **Log Transformation**.  
+2. **Large numbers with negative exponentials** ➝ Use **Signed Log or Box-Cox Transformation**.  
+3. **Numbers that include zero** ➝ Apply **Log1p Transformation**.  
+4. **Data following a Gaussian/Normal distribution** ➝ Use **StandardScaler**.  
+5. **Data with a uniform distribution** ➝ Apply **Min-Max Scaler**.  
+6. **Data with many outliers** ➝ Use **Robust Scaler**.  
+
+### 📝 Transforming Categorical Data  
+1. **Ordinal Categories** (Has hierarchy or ranking)  
+   - Assign lower numbers to lower ranks and higher numbers to higher ranks.  
+
+2. **Nominal Categories** (No hierarchy)  
+   - Convert to numerical values in a consistent way and stick to it.  
+
+3. **One-Hot Encoding**  
+   - Creates separate columns for each category.  
+   - Useful, but may introduce many new columns. So, use wisely!  
+
+4. **Target Encoding (Mean/Frequency Encoding)**  
+   - For each category, compute the **mean or frequency** of the target variable.  
+   - Best for **high-cardinality data** (columns with many unique categories).  
+
+### 🚨 Important Notes  
+- Completely ignore **globally unique columns** like `ID`, `Unique Key`, etc., as they don’t contribute to the model.
 ---
 
 ## Common Machine Learning Algorithms 🤖
